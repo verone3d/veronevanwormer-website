@@ -2,6 +2,9 @@ const fs = require('fs').promises;
 const path = require('path');
 const Handlebars = require('handlebars');
 
+// Register helpers
+Handlebars.registerHelper('currentYear', () => new Date().getFullYear());
+
 const pages = [
     {
         name: 'index',
