@@ -1,9 +1,16 @@
 <div class="container mx-auto px-4">
-    <h2 class="section-title mb-8">Lithophanes</h2>
+    <h2 class="section-title mb-8">Amateur Radio</h2>
     <div class="gallery grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {{#each images}}
-        <div class="gallery-item">
-            <img src="images/lithophanes/{{this}}" alt="{{this}}" class="w-full h-64 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="gallery-item bg-gray-800 rounded-lg overflow-hidden">
+            <img 
+                src="images/amateur-radio/{{this}}" 
+                alt="Amateur Radio Equipment" 
+                class="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
+            >
+            <div class="p-4">
+                <p class="text-gray-300 text-sm">{{replace this '.jpg' ''}}</p>
+            </div>
         </div>
         {{/each}}
     </div>

@@ -21,7 +21,8 @@ const pages = [
     {
         name: 'radio',
         title: 'Amateur Radio | Verone VanWormer',
-        isRadio: true
+        isRadio: true,
+        heading: 'Amateur Radio'
     }
 ];
 
