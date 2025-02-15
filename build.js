@@ -48,15 +48,41 @@ async function build() {
     const layoutContent = await fs.readFile('views/layouts/main.hbs', 'utf-8');
     const layoutTemplate = Handlebars.compile(layoutContent);
     
+    // Function to get images from a directory
+    async function getImagesFromDir(dir) {
+        try {
+            const files = await fs.readdir(`public/images/${dir}`);
+            return files.filter(file => 
+                file.toLowerCase().endsWith('.jpg') || 
+                file.toLowerCase().endsWith('.jpeg') || 
+                file.toLowerCase().endsWith('.png') ||
+                file.toLowerCase().endsWith('.gif')
+            );
+        } catch (error) {
+            console.warn(`No images found in ${dir}:`, error);
+            return [];
+        }
+    }
+
     // Build each page
     for (const page of pages) {
         const pageContent = await fs.readFile(`views/${page.name}.hbs`, 'utf-8');
         const pageTemplate = Handlebars.compile(pageContent);
         
+        // Get images for the current section
+        let images = [];
+        if (page.name === 'photography') {
+            images = await getImagesFromDir('photography');
+        } else if (page.name === 'lithophanes') {
+            images = await getImagesFromDir('lithophanes');
+        } else if (page.name === 'radio') {
+            images = await getImagesFromDir('amateur-radio');
+        }
+        
         const fullPage = layoutTemplate({
             ...page,
-            body: pageTemplate(page)
-        });
+            images,
+            body: pageTemplate({ ...page, images })
         
         await fs.writeFile(`dist/${page.name}.html`, fullPage);
     }

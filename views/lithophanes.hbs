@@ -1,0 +1,10 @@
+<div class="container mx-auto px-4">
+    <h2 class="section-title mb-8">Lithophanes</h2>
+    <div class="gallery grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {{#each images}}
+        <div class="gallery-item">
+            <img src="images/lithophanes/{{this}}" alt="{{this}}" class="w-full h-64 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+        </div>
+        {{/each}}
+    </div>
+</div>
