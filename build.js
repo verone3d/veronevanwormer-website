@@ -2,101 +2,105 @@ const fs = require('fs').promises;
 const path = require('path');
 const Handlebars = require('handlebars');
 
-// Register helpers
-Handlebars.registerHelper('currentYear', () => new Date().getFullYear());
-
 const pages = [
     {
         name: 'index',
-        title: 'Home | Veron Evanwormer',
+        title: 'Home | Verone VanWormer',
         isHome: true
     },
     {
         name: 'photography',
-        title: 'Photography | Veron Evanwormer',
+        title: 'Photography | Verone VanWormer',
         isPhotography: true
     },
     {
         name: 'lithophanes',
-        title: 'Lithophanes | Veron Evanwormer',
+        title: 'Lithophanes | Verone VanWormer',
         isLithophanes: true
     },
     {
         name: 'radio',
-        title: 'Amateur Radio | Veron Evanwormer',
+        title: 'Amateur Radio | Verone VanWormer',
         isRadio: true
     }
 ];
 
-async function build() {
-    // Create dist directory
-    await fs.mkdir('dist', { recursive: true });
-    
-    // Copy static assets
-    await fs.cp('public', 'dist', { recursive: true });
-    
-    // Register partials
-    const partialsDir = 'views/partials';
-    const partialFiles = await fs.readdir(partialsDir);
-    for (const file of partialFiles) {
-        const content = await fs.readFile(path.join(partialsDir, file), 'utf-8');
-        const partialName = path.parse(file).name;
-        Handlebars.registerPartial(partialName, content);
-    }
-    
-    // Read main layout
-    const layoutContent = await fs.readFile('views/layouts/main.hbs', 'utf-8');
-    const layoutTemplate = Handlebars.compile(layoutContent);
-    
-    // Function to get images from a directory
-    async function getImagesFromDir(dir) {
-        try {
-            const files = await fs.readdir(`public/images/${dir}`);
+// Function to get images from a directory
+function getImagesFromDir(dir) {
+    return fs.readdir(`public/images/${dir}`)
+        .then(files => {
             return files.filter(file => 
                 file.toLowerCase().endsWith('.jpg') || 
                 file.toLowerCase().endsWith('.jpeg') || 
                 file.toLowerCase().endsWith('.png') ||
                 file.toLowerCase().endsWith('.gif')
             );
-        } catch (error) {
+        })
+        .catch(error => {
             console.warn(`No images found in ${dir}:`, error);
             return [];
-        }
-    }
-
-    // Build each page
-    for (const page of pages) {
-        const pageContent = await fs.readFile(`views/${page.name}.hbs`, 'utf-8');
-        const pageTemplate = Handlebars.compile(pageContent);
-        
-        // Get images for the current section
-        let images = [];
-        if (page.name === 'photography') {
-            images = await getImagesFromDir('photography');
-        } else if (page.name === 'lithophanes') {
-            images = await getImagesFromDir('lithophanes');
-        } else if (page.name === 'radio') {
-            images = await getImagesFromDir('amateur-radio');
-        }
-        
-        const fullPage = layoutTemplate({
-            ...page,
-            images,
-            body: pageTemplate({ ...page, images })
-        
-        await fs.writeFile(`dist/${page.name}.html`, fullPage);
-    }
-    
-    // Create 404 page
-    const notFoundContent = await fs.readFile('views/404.hbs', 'utf-8');
-    const notFoundTemplate = Handlebars.compile(notFoundContent);
-    const notFoundPage = layoutTemplate({
-        title: '404 - Page Not Found',
-        body: notFoundTemplate()
-    });
-    await fs.writeFile('dist/404.html', notFoundPage);
-    
-    console.log('Build completed successfully!');
+        });
 }
 
-build().catch(console.error);
+// Register helpers
+Handlebars.registerHelper('currentYear', () => new Date().getFullYear());
+
+// Create dist directory
+fs.mkdir('dist', { recursive: true })
+    .then(() => fs.cp('public', 'dist', { recursive: true }))
+    .then(() => {
+        // Register partials
+        return fs.readdir('views/partials')
+            .then(files => {
+                return Promise.all(files.map(file => {
+                    return fs.readFile(path.join('views/partials', file), 'utf-8')
+                        .then(content => {
+                            const partialName = path.parse(file).name;
+                            Handlebars.registerPartial(partialName, content);
+                        });
+                }));
+            });
+    })
+    .then(() => {
+        // Read main layout
+        return fs.readFile('views/layouts/main.hbs', 'utf-8');
+    })
+    .then(layoutContent => {
+        const layoutTemplate = Handlebars.compile(layoutContent);
+
+        // Build each page
+        return Promise.all(pages.map(page => {
+            return fs.readFile(`views/${page.name}.hbs`, 'utf-8')
+                .then(pageContent => {
+                    const pageTemplate = Handlebars.compile(pageContent);
+
+                    // Get images for the current section
+                    let imagesPromise;
+                    if (page.name === 'photography') {
+                        imagesPromise = getImagesFromDir('photography');
+                    } else if (page.name === 'lithophanes') {
+                        imagesPromise = getImagesFromDir('lithophanes');
+                    } else if (page.name === 'radio') {
+                        imagesPromise = getImagesFromDir('amateur-radio');
+                    } else {
+                        imagesPromise = Promise.resolve([]);
+                    }
+
+                    return imagesPromise.then(images => {
+                        const fullPage = layoutTemplate({
+                            ...page,
+                            images,
+                            body: pageTemplate({ ...page, images })
+                        });
+                        return fs.writeFile(`dist/${page.name}.html`, fullPage);
+                    });
+                });
+        }));
+    })
+    .then(() => {
+        console.log('Build completed successfully!');
+    })
+    .catch(error => {
+        console.error('Build failed:', error);
+        process.exit(1);
+    });
