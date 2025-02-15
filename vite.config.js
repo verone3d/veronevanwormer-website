@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/', // Base path for production
+  base: '/veronevanwormer-website/', // Updated to match your subdirectory
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
