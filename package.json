@@ -1,24 +1,19 @@
 {
   "name": "veronevanwormer-portfolio",
   "version": "1.0.0",
-  "description": "Personal portfolio website showcasing photography, lithophanes, and amateur radio",
-  "main": "src/server.js",
+  "description": "Personal portfolio website",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
     "clean": "rm -rf dist",
-    "copy-static": "cp -r public dist/ && cp -r views dist/",
-    "copy-server": "cp -r src dist/ && cp package.json dist/",
-    "build": "npm run clean && mkdir dist && npm run copy-static && npm run copy-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run clean && node build.js",
+    "dev": "vite",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "express-handlebars": "^7.1.2",
-    "compression": "^1.7.4",
-    "helmet": "^7.1.0"
+    "gsap": "^3.12.5"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "vite": "^5.1.4",
+    "handlebars": "^4.7.8",
+    "rimraf": "^5.0.5"
   }
 }
