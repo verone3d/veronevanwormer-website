@@ -45,6 +45,9 @@ function getImagesFromDir(dir) {
 
 // Register helpers
 Handlebars.registerHelper('currentYear', () => new Date().getFullYear());
+Handlebars.registerHelper('baseName', (str) => {
+    return str.replace(/\.[^/.]+$/, '');
+});
 
 // Create dist directory
 fs.mkdir('dist', { recursive: true })
