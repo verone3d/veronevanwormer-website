@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "clean": "rm -rf dist",
+    "copy-static": "cp -r public dist/ && cp -r views dist/",
+    "copy-server": "cp -r src dist/ && cp package.json dist/",
+    "build": "npm run clean && mkdir dist && npm run copy-static && npm run copy-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

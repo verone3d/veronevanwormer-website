@@ -19,9 +19,10 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
-    - name: Create deployment package
+    - name: Build project
       run: |
-        zip -r deploy.zip . -x "*.git*"
+        npm run build
+        cd dist && npm install --production
 
     - name: Deploy to GoDaddy via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -31,7 +32,4 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./dist/
         server-dir: /public_html/veronevanwormer-website/
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
+        dangerous-clean-slate: true
