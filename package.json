@@ -1,0 +1,20 @@
+{
+  "name": "veronevanwormer-portfolio",
+  "version": "1.0.0",
+  "description": "Personal portfolio website showcasing photography, lithophanes, and amateur radio",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "compression": "^1.7.4",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
